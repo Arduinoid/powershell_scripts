@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><%= $title %></title>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
+</head>
+<body>
+    <div class='container'>
+    <h1><%= $heading %></h1>
+    <ul>
+    <% 1..10 | % { -%>
+            <li><%= $_ %></li>
+        <% } -%>
+        </ul>
+    </div>
+    <%= Invoke-EpsTemplate .\template.1.psml %>
+</body>
+</html>
