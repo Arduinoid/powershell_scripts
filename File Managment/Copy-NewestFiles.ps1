@@ -18,7 +18,7 @@ function Copy-NewestFiles($Source, $Destination) {
         # Check if there are any new files
         if ($newest_files -ne $null) {
             # Copy files from source to destination
-            echo "$divider$($newest_files.count) items to copy from $current_dir`n$divider"
+            echo "  | $divider$($newest_files.count) | items to copy from $current_dir`n$divider"
             $newest_files | % {
                 Copy-Item -Path "$Source\$current_dir\$_" `
                           -Destination "$Destination\$current_dir\$_"
