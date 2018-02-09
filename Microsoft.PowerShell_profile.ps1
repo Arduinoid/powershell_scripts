@@ -148,16 +148,19 @@ function Check-DBBackups {
 }
 
 function Check-SlackBot ($LogLength=5, $server='NAS-R510') {
-    $log_size = icm $server { ls C:\Scripts\slack_bot_log.txt | select name, @{label='Size';e={"{0:N2}kb" -f  ($_.length / 1kb)}} }
-    $last_20 = icm $server { cat C:\Scripts\slack_bot_log.txt -tail $Using:LogLength | sort -Descending }
-    $bot_pid = icm $server { cat C:\Users\Jon\Documents\watermark_slack_bot\pid.txt }
+    $path = "\\$server\c$"
+    $log_size = ls "$path\Scripts\slack_bot_log.txt" | select name, @{label='Size';e={"{0:N2}kb" -f  ($_.length / 1kb)}}
+    $log_tail = Get-Content -Path "$path\Scripts\slack_bot_log.txt" | sls restarted | select -Last 5
+    $bot_pid = cat "$path\watermark_slack_bot\pid.txt"
     $slack_bot_process = "Slack Bot running on PID: $bot_pid"
     
-    echo $(if (Get-Process -ComputerName $server -Id $bot_pid -ErrorAction SilentlyContinue) {$slack_bot_process} else {Write-Host 'Python process not running' -ForegroundColor Red})
+    echo $(if (Get-Process -ComputerName $server -Id $bot_pid -ErrorAction SilentlyContinue) {">>>>`n$slack_bot_process"} else {Write-Host 'Python process not running' -ForegroundColor Red})
     echo $log_size | Format-list @{label='Log File';e={$_.name}}, `
                                  Size, `
-                                 @{label='Server';e={$_.pscomputername}}
-    echo $last_20
+                                 @{label='Server';e={$server}}
+    
+    echo ">>> Last $LogLength restart events recorded in the log`n"
+    echo $log_tail
 }
 
 function Check-ActionTV () {
@@ -170,7 +173,7 @@ function Check-ActionTV () {
 $check_IPs = @(
     @{name = 'Firewall'; ip = '10.11.0.1'},
     @{name = 'Google'; ip = '8.8.8.8'},
-    @{name = 'DB-R620-1'; ip = '10.11.10.200'},
+    @{name = 'DB-R620-2'; ip = '10.11.10.200'},
     @{name = 'PDC-2016-VM'; ip = '10.11.203.30'},
     @{name = 'NAS-R510'; ip = '10.11.10.202'},
     @{name = 'WEB-R610'; ip = '10.11.10.201'}
